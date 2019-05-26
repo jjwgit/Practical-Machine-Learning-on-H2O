@@ -1,39 +1,56 @@
-# Week 2 Assignment
+---
+title: "Week 2"
+output: 
+  html_document: 
+    highlight: pygments
+    theme: united
+---
 
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
 
+## Connect h2o
+
+```{r, message = FALSE}
 library(h2o)
 library(tidyverse)
-
 h2o.init()
+h2o.no_progress()
+```
 
-# STEP 1, 2 ------
+## STEP 1, 2
 
+```{r}
 set.seed(46)
 
 id <- 1:1000
 blood_types <- c('a','a','a','o','o','o','ab','b') %>% str_to_upper()
 age <- runif(1000, 18, 65)
 he <- round(rnorm(1000, 5, 2))
-he <- pmax(v, 0)
-he <- pmin(v, 9)
+he <- pmax(he, 0)
+he <- pmin(he, 9)
 
 als <-round(rnorm(1000, 5, 2))
 als <- als + ifelse(age > 30, 1, 0)
-als <- pmax(v, 0)
-als <- pmin(v, 9)
+als <- pmax(als, 0)
+als <- pmin(als, 9)
 
 inc <- 20000 + (age*3)^2
-inc <- inc + hl*500
+inc <- inc + he*500
 inc <- inc - als * 300
 inc <- inc + runif(1000, 0, 5000)
 
 
 df <- data.frame(id = id, blood_type = blood_types, age = age, healthy_eating = he, active_life_style = als, income = inc)
-df$blood_type <- as.factor(blood_types[d$id %% length(blood_types) + 1])
+df$blood_type <- as.factor(blood_types[df$id %% length(blood_types) + 1])
 
 as.h2o(df, destination_frame = 'people')
+```
 
-### PART 3 -----
+## STEP 3
+
+```{r}
 people <- h2o.getFrame('people')
 parts <- h2o.splitFrame(
   people,
@@ -47,15 +64,19 @@ map_dbl(parts, nrow)
 train <- parts[[1]]
 valid <- parts[[2]]
 test <- parts[[3]]
+```
 
-# STEP 4, 5 -----
+## STEP 4, 5
 
+```{r}
 arguments <- names(people)[!names(people) %in% ('id')]
 x <- arguments[!(arguments %in% ('blood_type'))]
 y <- 'blood_type'
+```
 
-## Classify Blood type using RF -----
+### Classify Blood type using RF
 
+```{r}
 mRF <- h2o.randomForest(x, y, train)
 mRF
 
@@ -66,9 +87,11 @@ mRF2 <- h2o.randomForest(x, y, train, ntrees = 100, max_depth = 20)
 mRF2
 h2o.performance(mRF2, valid)
 h2o.performance(mRF2, test)
+```
 
-## Classify Blood type using GBM ----
+### Classify Blood type using GBM
 
+```{r}
 mGBM <- h2o.gbm(x, y, train)
 mGBM
 
@@ -80,8 +103,10 @@ mGBM2
 
 h2o.performance(mGBM2, valid)
 h2o.performance(mGBM2, test)
+```
 
+## STEP 6 
 
-# STEP 6 ------
-
-h2o.shutdown()
+```{r}
+h2o.shutdown(prompt = FALSE)
+```

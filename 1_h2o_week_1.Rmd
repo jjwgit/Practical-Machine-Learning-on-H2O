@@ -1,6 +1,26 @@
+---
+title: "Week 1"
+output: 
+  html_document: 
+    highlight: pygments
+    theme: united
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Connect h2o
+
+```{r, message = FALSE}
 library(h2o)
 h2o.init()
+h2o.no_progress()
+```
 
+## Get Data
+
+```{r}
 url <- 'http://h2o-public-test-data.s3.amazonaws.com/smalldata/iris/iris_wheader.csv'
 iris <- h2o.importFile(url)
 
@@ -11,7 +31,11 @@ test <- parts[[2]]
 summary(train)
 nrow(train)
 nrow(test)
+```
 
+## Develop Model
+
+```{r}
 mDL <- h2o.deeplearning(1:4, 5, train)
 
 mDL
@@ -23,5 +47,10 @@ h2o.performance(mDL, test)
 mRF <- h2o.randomForest(1:4, 5, train)
 mRF
 h2o.performance(mRF, test)
+```
 
-h2o.shutdown()
+## Disconnect h2o
+
+```{r}
+h2o.shutdown(prompt = FALSE)
+```
