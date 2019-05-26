@@ -1,15 +1,51 @@
 # Coursera course: Practical Machine Learning on H2O
 
+### Week 1
 
-* [Week 1](https://github.com/jjwgit/Practical-Machine-Learning-on-H2O/blob/master/1_h2o_week_1.R) covers importing data and making model on h2o server
+* Fundamentals of H2O
 
-* [Week 2](https://github.com/jjwgit/Practical-Machine-Learning-on-H2O/blob/master/2_h2o_week_2.R) covers submitting data from R client to h2o server and making classification model using Random Forest and Gradient Boosting Machine
 
-* [Week 3]() WIP
+### Week 2
 
-* [Week 4]() WIP
+* Tree Algorithms
+  + Random Forest
+  + GBM
+  
+* Data Split
+  + Train/Valid/Test
+  + Cross-validation
 
-* [Week 5]() WIP
 
-* [Week 6]() WIP
+### Week 3
 
+* Loading and Saving Data
+
+* GLM and Naive Bayes
+
+* Data Manipulation
+
+* Grid Search
+
+### Week 4
+
+* Early Stopping
+
+* Binding and Merging Data
+
+* Deep Learning
+
+### Week 5
+
+* Autoencoders
+
+* PCA and GLRM
+
+* Clustering
+
+* Handle Missing Data
+
+### Week 6
+
+* Ensembles
+
+* Final Project
