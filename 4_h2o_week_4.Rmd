@@ -1,0 +1,79 @@
+---
+title: "Week 4"
+output: 
+  html_document: 
+    highlight: pygments
+    theme: united
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Connect h2o
+
+```{r connect, message = FALSE}
+library(h2o)
+library(tidyverse)
+library(magrittr)
+h2o.init()
+h2o.no_progress()
+```
+
+## Split Data
+
+```{r splitData}
+url <- 'http://coursera.h2o.ai/cacao.882.csv'
+cacao <- h2o.importFile(url)
+parts <- h2o.splitFrame(cacao, ratios = c(0.8, 0.1),seed = 46)
+train <- parts[[1]]
+valid <- parts[[2]]
+test <- parts[[3]]
+```
+
+## Develop Model
+
+```{r model}
+colnames(train)
+x <- colnames(train)[!colnames(train) %in% 'Rating']
+y <- 'Rating'
+
+# Base Model
+
+mDL_base <- h2o.deeplearning(x = x,
+                             y = y,
+                             training_frame = train,
+                             validation_frame = valid,
+                             seed = 46
+                            )
+mDL_base
+
+h2o.performance(mDL_base, test) ## RMSE 0.434063
+
+# Tuned Model
+
+mDL_tune <- h2o.deeplearning(x = x, 
+                             y = y, 
+                             training_frame = train,
+                             validation_frame = valid,
+                             activation = "Maxout",
+                             hidden = c(128, 64, 32, 16, 4),
+                             seed = 46)
+
+mDL_tune
+
+h2o.performance(mDL_tune, test) ## RMSE 0.4209688
+```
+
+## Save Model
+
+```{r saveModel}
+h2o.saveModel(mDL_base, './model')
+h2o.saveModel(mDL_tune, './model')
+```
+
+## Shutdown
+
+```{r shutdown}
+h2o.shutdown(prompt = FALSE)
+```
