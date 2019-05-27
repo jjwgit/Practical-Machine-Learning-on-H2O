@@ -1,0 +1,36 @@
+---
+title: "Week 6"
+output: 
+  html_document: 
+    highlight: pygments
+    theme: united
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Connect h2o
+
+```{r connect, message = FALSE}
+library(h2o)
+library(tidyverse)
+library(magrittr)
+h2o.init()
+h2o.no_progress()
+```
+
+
+Project Choice #1
+
+http://coursera.h2o.ai/house_data.3487.csv
+
+This is a regression problem. You have to predict "price".
+
+You should split date into year and month columns. You can then optionally combine them into a numeric date column.
+
+Split the data into train and test, using 0.9 for the ratio, and a seed of 123. That should give you 19,462 training rows and 2,151 test rows.
+
+If you decide you want a valid data set, too, split that from train after doing the above split.
+
+Your target is an RMSE below $123,000.
