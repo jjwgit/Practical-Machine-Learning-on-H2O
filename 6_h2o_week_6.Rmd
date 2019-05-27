@@ -15,22 +15,108 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{r connect, message = FALSE}
 library(h2o)
 library(tidyverse)
+library(lubridate)
 library(magrittr)
+
 h2o.init()
 h2o.no_progress()
 ```
 
 
-Project Choice #1
 
-http://coursera.h2o.ai/house_data.3487.csv
+## Get Data
 
-This is a regression problem. You have to predict "price".
+```{r}
+# url <- 'http://coursera.h2o.ai/house_data.3487.csv'
+# house <- read_csv(url)
+# write_csv(house, './temp/house.csv')
 
-You should split date into year and month columns. You can then optionally combine them into a numeric date column.
+house <- read_csv('./temp/house.csv') 
 
-Split the data into train and test, using 0.9 for the ratio, and a seed of 123. That should give you 19,462 training rows and 2,151 test rows.
+house_cleaned <- house %>% select(-id) %>% mutate(year = year(date), month = month(date), day = day(date)) %>% select(-date)
 
-If you decide you want a valid data set, too, split that from train after doing the above split.
+house_h2o <- as.h2o(house_cleaned)
 
-Your target is an RMSE below $123,000.
+parts_h2o <- h2o.splitFrame(house_h2o, 0.9, seed = 123)
+
+train_h2o <- parts_h2o[[1]]
+test_h2o <- parts_h2o[[2]]
+
+nrow(train_h2o)
+nrow(test_h2o)
+
+y <- 1
+x <- 2:22
+
+m_glm_base <-
+  h2o.glm(
+    x = x,
+    y = y,
+    training_frame = train_h2o,
+    model_id = 'base_glm',
+    seed = 123,
+    family = 'gaussian',
+    nfolds = 5,
+    fold_assignment = "Modulo",
+    keep_cross_validation_predictions = TRUE
+  )
+
+h2o.performance(m_glm_base, test_h2o) # 360908.6
+
+m_glm_lasso <- h2o.glm(
+  x = x,
+  y = y,
+  training_frame = train_h2o,
+  seed = 123,
+  family = 'gaussian',
+  alpha = 1,
+  lambda_search = TRUE,
+  nfolds = 5,
+  fold_assignment = "Modulo",
+  keep_cross_validation_predictions = TRUE
+)
+
+h2o.performance(m_glm_lasso, test_h2o) # 194171.3
+
+
+m_xgb_base <- h2o.xgboost(
+  x = x,
+  y = y,
+  training_frame = train_h2o,
+  seed = 123,
+  nfolds = 5,
+  fold_assignment = "Modulo",
+  keep_cross_validation_predictions = TRUE
+)
+
+h2o.performance(m_xgb_base, test_h2o) # 122499.4
+
+
+# h2o.saveModel(m_xgb_base, './')
+# h2o.saveModel(m_glm_lasso, './')
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
