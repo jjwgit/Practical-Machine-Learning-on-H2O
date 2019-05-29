@@ -78,7 +78,7 @@ m_glm_lasso <- h2o.glm(
 
 h2o.performance(m_glm_lasso, test_h2o) # 194171.3
 
-
+a <- Sys.time()
 m_xgb_base <- h2o.xgboost(
   x = x,
   y = y,
@@ -88,12 +88,51 @@ m_xgb_base <- h2o.xgboost(
   fold_assignment = "Modulo",
   keep_cross_validation_predictions = TRUE
 )
+e <- Sys.time()
+
+e-a
 
 h2o.performance(m_xgb_base, test_h2o) # 122499.4
 
 
+m_gbm_base <- h2o.gbm(
+  x = x,
+  y = y,
+  training_frame = train_h2o,
+  seed = 123,
+  nfolds = 5,
+  fold_assignment = "Modulo",
+  keep_cross_validation_predictions = TRUE
+)
+
+h2o.performance(m_gbm_base, test_h2o) ## 123969.1
+
+ids <- c(m_gbm_base@model_id, m_xgb_base@model_id)
+
+m_se <- h2o.stackedEnsemble(
+  x = x,
+  y = y,
+  training_frame = train_h2o,
+  base_models = c(m_gbm_base@model_id, m_xgb_base@model_id)
+)
+
+h2o.performance(m_se, test_h2o) ## 362749
+
+# H2ORegressionMetrics: stackedensemble
+# 
+# MSE:  131586803632
+# RMSE:  362749
+# MAE:  237071.6
+# RMSLE:  0.5529791
+# Mean Residual Deviance :  131586803632
+
+
+
+
+# h2o.saveModel(m_gbm_base, './')
 # h2o.saveModel(m_xgb_base, './')
-# h2o.saveModel(m_glm_lasso, './')
+# h2o.saveModel(m_se, "./")
+
 ```
 
 
