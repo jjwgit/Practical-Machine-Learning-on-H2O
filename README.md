@@ -1,4 +1,4 @@
-# Coursera course: Practical Machine Learning on H2O
+# [Coursera course: Practical Machine Learning on H2O](https://www.coursera.org/learn/machine-learning-h2o)
 
 ### Week 1
 
